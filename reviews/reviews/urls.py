@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter, DefaultRouter
 
-from article.views import ArticleList, CategoryArticleList, login_auth
+from article.views import ArticleList, CategoryArticleList, login_auth, ArticleUserRelationView, TagView
 
 router = DefaultRouter()
 router.register(r'article', ArticleList, basename='article')
 router.register(r'category', CategoryArticleList, basename='category')
+router.register(r'tag', TagView, basename='tag')
+router.register(r'article_relation', ArticleUserRelationView, basename='relation')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
