@@ -11,39 +11,43 @@ class Article(models.Model):
     slug = models.SlugField(unique=True, max_length=255, blank=False, db_index=True)
     category = models.ForeignKey('CategoryArticle', on_delete=models.PROTECT,
                                  related_name='articles',
-                                 verbose_name='Категория')
+                                 verbose_name='Категория',
+                                 blank=True, default=None)
     owner = models.ForeignKey(User,
                               on_delete=models.SET_NULL,
                               related_name='owner_articles',
                               verbose_name='Владелец',
-                              null=True,)
+                              null=True, )
     readers = models.ManyToManyField(User,
                                      through='ArticleUserRelations',
                                      related_name='readers_articles')
     tagged_by = models.ManyToManyField("Tag", related_name='articles',
                                        blank=True)
+    rating = models.DecimalField(max_digits=3, default=None, null=True,
+                                 decimal_places=2)
 
     def __str__(self):
         return self.title
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ['id']
         verbose_name = 'Статья'
         verbose_name_plural = 'Статьи'
         indexes = [
-            models.Index(fields=['-created_at'])
+            models.Index(fields=['-created_at', 'id'])
         ]
 
 
 class CategoryArticle(models.Model):
     name = models.CharField(max_length=255, blank=False)
     slug = models.SlugField(unique=True, max_length=255, db_index=True, verbose_name='Слаг')
+    content = models.CharField(max_length=1000)
 
     def __str__(self):
-        return self.name
+        return f"id - {self.pk}, name - {self.name}, slug - {self.slug}"
 
     class Meta:
-        ordering = ['name']
+        ordering = ['name', 'slug']
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
         indexes = [
@@ -67,6 +71,16 @@ class ArticleUserRelations(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.article}'
+
+    def save(self, *args, **kwargs):
+        from article.logic import set_rating
+        flag = self.pk
+        old_rating = self.rating
+        super().save(*args, **kwargs)
+
+        new_rating = self.rating
+        if old_rating != new_rating or flag:
+            set_rating(self.article)
 
 
 class Tag(models.Model):

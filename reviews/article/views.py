@@ -14,13 +14,15 @@ from rest_framework import filters, mixins
 
 
 class ArticleList(ModelViewSet):
-    queryset = Article.objects.all().annotate(
+    queryset = (Article.objects.annotate(
         annotated_likes=
         Count(
             Case(
                 When(article_relations__like=True,
                      then=1))),
-        rating=Avg("article_relations__rating"))
+    )
+                .select_related('category', 'owner')
+                .prefetch_related('readers', 'tagged_by'))
     serializer_class = ArticleSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter,
                        filters.OrderingFilter]
@@ -44,7 +46,7 @@ def login_auth(request):
 
 
 class ArticleUserRelationView(UpdateModelMixin, GenericViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndOwnerOrReadOnlyOrStaff]
     queryset = ArticleUserRelations.objects.all()
     serializer_class = ArticleUserRelationSerializer
     lookup_field = 'article'

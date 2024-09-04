@@ -72,8 +72,7 @@ class ArticleAPITestCase(APITestCase):
             Count(
                 Case(
                     When(article_relations__like=True,
-                         then=1))),
-            rating=Avg("article_relations__rating"))
+                         then=1))))
         serializer_data = ArticleSerializer(articles, many=True).data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(serializer_data, response.data)
@@ -87,9 +86,11 @@ class ArticleAPITestCase(APITestCase):
             Count(
                 Case(
                     When(article_relations__like=True,
-                         then=1))),
-            rating=Avg("article_relations__rating"))
+                         then=1)))).order_by('id')
         serializer_data = ArticleSerializer(articles, many=True).data
+        print(response.data)
+        print('\n')
+        print(serializer_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(serializer_data, response.data)
 
@@ -102,8 +103,7 @@ class ArticleAPITestCase(APITestCase):
             Count(
                 Case(
                     When(article_relations__like=True,
-                         then=1))),
-            rating=Avg("article_relations__rating"))
+                         then=1)))).order_by('id')
         serializer_data = ArticleSerializer(articles, many=True).data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(serializer_data, response.data)
@@ -116,8 +116,7 @@ class ArticleAPITestCase(APITestCase):
             Count(
                 Case(
                     When(article_relations__like=True,
-                         then=1))),
-            rating=Avg("article_relations__rating")).order_by('-id')
+                         then=1)))).order_by('-id')
         serializer_data = ArticleSerializer(articles,
                                             many=True).data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -226,12 +225,13 @@ class ArticleAPITestCase(APITestCase):
         content = JSONRenderer().render(data)
         response = self.client.post(url, data=content, content_type='application/json')
         tag_created = Tag.objects.get(tag_name="test_tag_x")
+        # print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.article_test.tagged_by.add(tag_created, self.tag_2)
-
-        self.assertEqual(self.article_test.tagged_by.get(tag_name="test_tag_x").slug, 'test-tag-x')
+        self.article_test.tagged_by.add(tag_created)
+        self.article_test.tagged_by.add(self.tag_2)
         self.assertEqual(self.article_test.tagged_by.get(tag_name='test_tag-2').slug, 'test-tag-2')
+        self.assertEqual(self.article_test.tagged_by.get(tag_name="test_tag_x").slug, 'test-tag-x')
 
 
 class ArticleUserRelationTestCase(APITestCase):
