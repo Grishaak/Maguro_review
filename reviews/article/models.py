@@ -24,7 +24,7 @@ class Article(models.Model):
     tagged_by = models.ManyToManyField("Tag", related_name='articles',
                                        blank=True)
     rating = models.DecimalField(max_digits=3, default=None, null=True,
-                                 decimal_places=2)
+                                 decimal_places=2, blank=True)
 
     def __str__(self):
         return self.title

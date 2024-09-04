@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-d8er&y=*y18ac@ux67outsx4-u83zqb_k(x2rnn5w5s9gt4786
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.88.130']
 
 # Application definition
 
@@ -85,12 +85,12 @@ WSGI_APPLICATION = 'reviews.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'maguro_review',
-        'USER': 'maguro',
-        'PASSWORD': 'vbifyz228422',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'maguro_review_project',
+        'USER': 'magur_rev_user',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
-        'PORT': 5432,
+        'PORT': '',
     }
 }
 
@@ -137,8 +137,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+import os
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
